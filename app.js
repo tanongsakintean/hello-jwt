@@ -1,12 +1,16 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const app = express();
+require('dotenv').config()
 
-var cors = require("cors");
-app.use(cors());
+const cors = require("cors");
+let corsOptions = {
+  origin: 'localhost' 
+};
+app.use(cors(corsOptions));
 
 let token = "";
-let secretKey = "1234";
+let secretKey = process.env.SECRET_KEY;
 
 app.use(express.json());
 app.get("/", (req, res) => res.json({ message: "Hello JWT" }));
@@ -30,7 +34,7 @@ app.get("/token", (req, res) => {
 });
 
 app.get("/protected", (req, res) => {
-  const token = req.headers.authorization.split(" ")[1];
+  const token = req.headers.authorization?.split(" ")[1];
 
   try {
     const decoded = jwt.verify(token, secretKey);
@@ -47,4 +51,6 @@ app.get("/protected", (req, res) => {
   }
 });
 
-app.listen(5001, () => console.log("Application is running on port 5001"));
+app.disable("x-powered-by");
+
+module.exports = app
